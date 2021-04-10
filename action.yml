@@ -5,6 +5,9 @@ inputs:
   generate-zip:
     description: 'Generate package zip file?'
     default: false
+  filename:
+    required: false
+    description: 'Custom file file name'
 outputs:
   path:
     description: 'Build path'
@@ -15,3 +18,4 @@ runs:
   image: 'Dockerfile'
   args:
     - ${{ inputs.generate-zip }}
+    - ${{ inputs.filename }}
