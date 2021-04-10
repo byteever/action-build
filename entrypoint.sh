@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 # Set variables
 GENERATE_ZIP=false
 BUILD_PATH="./build"
