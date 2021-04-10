@@ -10,23 +10,27 @@ if [ -z "$1" ]; then
 fi
 
 # If not configured defaults to repository name
-if [ -z "$PLUGIN_SLUG" ]; then
-  PLUGIN_SLUG=${GITHUB_REPOSITORY#*/}
+if [ -z "$FILENAME" ]; then
+  FILENAME=${GITHUB_REPOSITORY#*/}
 fi
 
 # Set GitHub "path" output
-DEST_PATH="$BUILD_PATH/$PLUGIN_SLUG"
+DEST_PATH="$BUILD_PATH/$FILENAME"
 echo "::set-output name=path::$DEST_PATH"
 
 cd "$GITHUB_WORKSPACE" || exit
 
-echo "Installing PHP and JS dependencies..."
+if test -f "${GITHUB_WORKSPACE}/composer.json"; then
+echo "Installing JS dependencies..."
 npm install
-composer install || exit "$?"
 echo "Running JS Build..."
 npm run build || exit "$?"
+fi
+
+if test -f "${GITHUB_WORKSPACE}/composer.json"; then
 echo "Cleaning up PHP dependencies..."
 composer install --no-dev || exit "$?"
+fi
 
 echo "Generating build directory..."
 rm -rf "$BUILD_PATH"
@@ -41,9 +45,9 @@ fi
 if ! $GENERATE_ZIP; then
   echo "Generating zip file..."
   cd "$BUILD_PATH" || exit
-  zip -r "${PLUGIN_SLUG}.zip" "$PLUGIN_SLUG/"
+  zip -r "${FILENAME}.zip" "$FILENAME/"
   # Set GitHub "zip_path" output
-  echo "::set-output name=zip_path::$BUILD_PATH/${PLUGIN_SLUG}.zip"
+  echo "::set-output name=zip_path::$BUILD_PATH/${FILENAME}.zip"
   echo "Zip file generated!"
 fi
 
